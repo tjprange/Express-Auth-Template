@@ -29,6 +29,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 
+// options for sessions to avoid depreciated warning
 const sessionOptions = {
   secret: 'badsecret',
   resave: false,
@@ -36,7 +37,7 @@ const sessionOptions = {
 };
 app.use(session(sessionOptions));
 
-// middleware for login
+// middleware for login stored on sesssion
 const requireLogin = (req, res, next) => {
   // invalid, redirect back to /login
   if (!req.session.user_id) {
@@ -90,17 +91,20 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// set the session user_id to null and redirect to login
 app.post('/logout', (req, res) => {
   req.session.user_id = null;
   res.redirect('/login');
 });
 
+// middleware requires session data in order to hit this route
 app.get('/secret', requireLogin, (req, res) => {
   res.render('secret');
 });
 
+// middleware requires session data in order to hit this route
 app.get('/topsecret', requireLogin, (req, res) => {
-  res.send('TOP SECRET!!!');
+  res.send('top secret route');
 });
 
 app.listen(3000, () => {
